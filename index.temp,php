@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pago con Conekta - MSI</title>
+  <script type="text/javascript" src="https://cdn.conekta.io/js/latest/conekta.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, select { display: block; margin-bottom: 10px; padding: 8px; width: 300px; }
+    button { padding: 10px 20px; }
+    #response { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>Formulario de Pago</h2>
+
+  <form id="payment-form">
+    <input type="text" data-conekta="card[name]" placeholder="Nombre del titular" required>
+    <input type="text" data-conekta="card[number]" placeholder="Número de tarjeta" required>
+    <input type="text" data-conekta="card[exp_month]" placeholder="Mes de expiración (MM)" required>
+    <input type="text" data-conekta="card[exp_year]" placeholder="Año de expiración (AA)" required>
+    <input type="text" data-conekta="card[cvc]" placeholder="CVC" required>
+
+    <select name="monthly_installments" required>
+      <option value="">Selecciona MSI</option>
+      <option value="3">3 meses</option>
+      <option value="6">6 meses</option>
+      <option value="9">9 meses</option>
+      <option value="12">12 meses</option>
+    </select>
+
+    <input type="email" name="email" placeholder="Correo electrónico" required>
+    <input type="text" name="name" placeholder="Nombre completo" required>
+    <input type="tel" name="phone" placeholder="Teléfono" required>
+
+    <input type="hidden" name="token_id" id="token_id">
+
+    <button type="submit" id="submit-button">Pagar</button>
+  </form>
+
+  <div id="response"></div>
+
+  <script>
+    Conekta.setPublicKey('key_DGjl2SLd8oDQJzRnusZMYr0'); // Reemplaza con tu llave pública
+
+    const form = document.getElementById("payment-form");
+    const responseDiv = document.getElementById("response");
+    const submitBtn = document.getElementById("submit-button");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      responseDiv.innerHTML = "⏳ Procesando...";
+      submitBtn.disabled = true;
+
+      Conekta.Token.create(form, function(tokenObject) {
+        document.getElementById("token_id").value = tokenObject.id;
+
+        const formData = new FormData(form);
+
+        fetch("crear_cargo.php", {
+          method: "POST",
+          body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+          submitBtn.disabled = false;
+
+          if (data.includes("not valid for installments") || data.includes("no es válido para pagos a meses sin intereses")) {
+            responseDiv.innerHTML = `<p style="color:red;">❌ Tu tarjeta no permite pagos a meses sin intereses. Intenta con una tarjeta de crédito.</p>`;
+          } else if (data.toLowerCase().includes("error")) {
+            responseDiv.innerHTML = `<p style="color:red;">❌ ${data}</p>`;
+          } else {
+            responseDiv.innerHTML = `<p style="color:green;">✅ ${data}</p>`;
+          }
+        })
+        .catch(error => {
+          submitBtn.disabled = false;
+          responseDiv.innerHTML = `<p style="color:red;">❌ Error de red: ${error}</p>`;
+        });
+
+      }, function(errorResponse) {
+        submitBtn.disabled = false;
+        responseDiv.innerHTML = `<p style="color:red;">❌ ${errorResponse.message_to_purchaser}</p>`;
+      });
+    });
+  </script>
+</body>
+</html>

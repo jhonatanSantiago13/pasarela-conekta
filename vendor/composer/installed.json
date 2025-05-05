@@ -1,0 +1,61 @@
+{
+    "packages": [
+        {
+            "name": "conekta/conekta-php",
+            "version": "v4.0.1",
+            "version_normalized": "4.0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/conekta/conekta-php.git",
+                "reference": "cd1bb3f1395b0882dde37f3b534974e979845bc0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/conekta/conekta-php/zipball/cd1bb3f1395b0882dde37f3b534974e979845bc0",
+                "reference": "cd1bb3f1395b0882dde37f3b534974e979845bc0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*"
+            },
+            "time": "2017-12-29T23:33:05+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "classmap": [
+                    "lib/Conekta/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Conekta  and contributors",
+                    "homepage": "https://github.com/conekta/conekta-php/contributors"
+                }
+            ],
+            "description": "Conekta PHP Library",
+            "homepage": "https://www.conekta.io/",
+            "keywords": [
+                "api",
+                "conekta",
+                "payment processing"
+            ],
+            "support": {
+                "issues": "https://github.com/conekta/conekta-php/issues",
+                "source": "https://github.com/conekta/conekta-php/tree/v4.0.1"
+            },
+            "install-path": "../conekta/conekta-php"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}
