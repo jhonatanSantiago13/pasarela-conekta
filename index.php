@@ -166,6 +166,8 @@ if (isset($_SESSION['pago_exitoso']) && $_SESSION['pago_exitoso'] === true) {
 
             <input type="hidden" name="token_id" id="token_id">
 
+            <input type="hidden" id="noPedido" name="noPedido" value=" 52254551212141414141">
+
             <button type="submit" id="submit-button">💳 Pagar</button>
             
       </form>

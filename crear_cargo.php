@@ -17,7 +17,7 @@ try {
 
     $orderData = [
         "line_items" => [[
-            "name" => "Producto con MSI",
+            "name" => $_POST['noPedido'],
             "unit_price" => intval($amount * 100),
             "quantity" => 1
         ]],
