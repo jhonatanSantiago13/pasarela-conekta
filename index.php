@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+// Si el pago ya se realizó, no permitir regresar aquí
+if (isset($_SESSION['pago_exitoso']) && $_SESSION['pago_exitoso'] === true) {
+    unset($_SESSION['pago_exitoso']); // Elimina la variable
+    header('Location: https://clarity.com.mx/'); // Redirige
+    exit;
+}
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -280,62 +291,47 @@
       }
     }); */
 
-    form.addEventListener("submit", function(event) {
-  event.preventDefault();
+  form.addEventListener("submit", function(event) {
+        event.preventDefault();
 
-  // Deshabilitar y cambiar diseño del botón
-  submitBtn.disabled = true;
-  submitBtn.style.backgroundColor = "#888";
-  submitBtn.innerHTML = "⏳ Procesando pago...";
+        // Deshabilitar y cambiar diseño del botón
+        submitBtn.disabled = true;
+        submitBtn.style.backgroundColor = "#888";
+        submitBtn.innerHTML = "⏳ Procesando pago...";
 
-  // Mostrar mensaje opcional
-  responseDiv.innerHTML = "⏳ Procesando...";
+        // Mostrar mensaje opcional
+        responseDiv.innerHTML = "⏳ Procesando...";
 
-  // Esperar 5 segundos antes de continuar
-  setTimeout(() => {
-    Conekta.Token.create(form, function(tokenObject) {
-      document.getElementById("token_id").value = tokenObject.id;
+        // Esperar 5 segundos antes de continuar
 
-      const formData = new FormData(form);
+        setTimeout(() => {
+          Conekta.Token.create(form, function(tokenObject) {
+            document.getElementById("token_id").value = tokenObject.id;
 
-      fetch("crear_cargo.php", {
-        method: "POST",
-        body: formData
-      })
-      .then(response => response.text())
-      .then(data => {
-        const msg = data.toLowerCase();
+            const formData = new FormData(form);
 
-        if (msg.includes("card_over_limit")) {
-          responseDiv.innerHTML = `<p style="color:red;">❌ La tarjeta no cuenta con el límite de crédito suficiente para realizar el pago.</p>`;
-        } else if (msg.includes("not valid for installments")) {
-          responseDiv.innerHTML = `<p style="color:red;">❌ Tu tarjeta no permite pagos a meses sin intereses. Usa una tarjeta de crédito.</p>`;
-        } else if (msg.includes("error")) {
-          responseDiv.innerHTML = `<p style="color:red;">❌ ${data}</p>`;
-        } else {
-          responseDiv.innerHTML = `<p style="color:green;">✅ ${data}</p>`;
-        }
+            fetch("crear_cargo.php", {
+              method: "POST",
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.status === "success") {
+                window.location.href = `success-payment.php?id=${data.order_id}`; // Redirige a la página de resumen
+              } else {
+                responseDiv.innerHTML = `<p style="color:red;">❌ ${data.message}</p>`;
+              }
 
-        // Restaurar el botón
-        submitBtn.disabled = false;
-        submitBtn.style.backgroundColor = "#28a745";
-        submitBtn.innerHTML = "💳 Pagar";
-      })
-      .catch(error => {
-        responseDiv.innerHTML = `<p style="color:red;">❌ Error de red: ${error.message}</p>`;
-        submitBtn.disabled = false;
-        submitBtn.style.backgroundColor = "#28a745";
-        submitBtn.innerHTML = "💳 Pagar";
-      });
+              submitBtn.disabled = false;
+              submitBtn.style.backgroundColor = "#28a745";
+              submitBtn.innerHTML = "💳 Pagar";
+            });
+          });
+        }, 5000); // ← Aquí se cierra correctamente setTimeout
 
-    }, function(errorResponse) {
-      responseDiv.innerHTML = `<p style="color:red;">❌ ${errorResponse.message_to_purchaser || "Error al generar el token."}</p>`;
-      submitBtn.disabled = false;
-      submitBtn.style.backgroundColor = "#28a745";
-      submitBtn.innerHTML = "💳 Pagar";
-    });
-  }, 5000); // Espera de 5 segundos
-});
+  
+    
+  }); //submit
 
    
   </script>
